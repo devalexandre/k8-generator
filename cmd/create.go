@@ -88,6 +88,7 @@ func CreateServiceAndDeployment(name string) {
 	os.WriteFile(fileName, data, 0644)
 	CreateIngress(name)
 	fmt.Printf("Service and deployment %v created", name)
+
 }
 
 func CreateDeployment(name string) {
@@ -109,10 +110,9 @@ func CreateService(name string) {
 }
 
 func CreateIngress(name string) {
-	url := fmt.Sprintf("%s%s-ingress", BaseURL, Ingress)
+	url := fmt.Sprintf("%s%s", BaseURL, Ingress)
 	data := GetData(url)
-
-	fileName := fmt.Sprintf("%s.yaml", name)
+	fileName := fmt.Sprintf("%s-ingress.yaml", name)
 	os.WriteFile(fileName, data, 0644)
 	fmt.Printf("Ingress %v created", name)
 }
