@@ -37,6 +37,7 @@ const (
 
 // createCmd represents the create command
 var Type, NameFile string
+var ServiceAndDeployment bool
 
 var createCmd = &cobra.Command{
 	Use:   "create",
@@ -51,30 +52,49 @@ var createCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		if Type == "" {
-			fmt.Println("Please, use -t for generate file")
-			os.Exit(1)
-		}
+		if ServiceAndDeployment {
+			CreateServiceAndDeployment(NameFile)
+		} else {
 
-		switch expression := Type; expression {
-		case "deployment":
-			CreateDeployment(NameFile)
-		case "service":
-			CreateService(NameFile)
-		case "ingress":
-			CreateIngress(NameFile)
-		default:
-			fmt.Println("Invalid option")
+			if Type == "" {
+				fmt.Println("Please, use -t for type file")
+				os.Exit(1)
+			}
 
+			switch expression := Type; expression {
+			case "deployment":
+				CreateDeployment(NameFile)
+			case "service":
+				CreateService(NameFile)
+			case "ingress":
+				CreateIngress(NameFile)
+			default:
+				fmt.Println("Invalid option")
+
+			}
 		}
 	},
+}
+
+func CreateServiceAndDeployment(name string) {
+	url := fmt.Sprintf("%s%s", BaseURL, Deployment)
+	dataDeployment := GetData(url)
+
+	url = fmt.Sprintf("%s%s", BaseURL, Service)
+	dataServicet := GetData(url)
+
+	fileName := fmt.Sprintf("%s.yaml", name)
+	data := fmt.Sprintln(string(dataDeployment), string(dataServicet))
+	os.WriteFile(fileName, []byte(data), 0644)
+	CreateIngress(name)
+	fmt.Printf("Service and deployment %v created", name)
 }
 
 func CreateDeployment(name string) {
 	url := fmt.Sprintf("%s%s", BaseURL, Deployment)
 	data := GetData(url)
 
-	fileName := fmt.Sprintf("%s.yaml", name)
+	fileName := fmt.Sprintf("%s-deployment.yaml", name)
 	os.WriteFile(fileName, data, 0644)
 	fmt.Printf("Deplymente %v created", name)
 }
@@ -83,13 +103,13 @@ func CreateService(name string) {
 	url := fmt.Sprintf("%s%s", BaseURL, Service)
 	data := GetData(url)
 
-	fileName := fmt.Sprintf("%s.yaml", name)
+	fileName := fmt.Sprintf("%s-service.yaml", name)
 	os.WriteFile(fileName, data, 0644)
 	fmt.Printf("Service %v created", name)
 }
 
 func CreateIngress(name string) {
-	url := fmt.Sprintf("%s%s", BaseURL, Ingress)
+	url := fmt.Sprintf("%s%s-ingress", BaseURL, Ingress)
 	data := GetData(url)
 
 	fileName := fmt.Sprintf("%s.yaml", name)
@@ -115,6 +135,7 @@ func init() {
 	rootCmd.AddCommand(createCmd)
 
 	// is called directly, e.g.:
-	createCmd.Flags().StringVarP(&name, "generate", "g", "", "file name")
+	createCmd.Flags().StringVarP(&NameFile, "generate", "g", "", "file name")
 	createCmd.Flags().StringVarP(&Type, "type", "t", "", "file type")
+	createCmd.Flags().BoolVarP(&ServiceAndDeployment, "generate-all", "a", false, "generate deployment, service, ingress")
 }
