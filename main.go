@@ -15,7 +15,7 @@ limitations under the License.
 */
 package main
 
-import "k8-generator/cmd"
+import "github.com/devalexandre/k8-generator/cmd"
 
 func main() {
 	cmd.Execute()

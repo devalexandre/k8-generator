@@ -1,4 +1,4 @@
-module k8-generator
+module github.com/devalexandre/k8-generator
 
 go 1.17
 
