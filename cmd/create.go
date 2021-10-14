@@ -33,6 +33,9 @@ const (
 	Service = "service.yaml"
 	// Ingress is the name of the ingress file
 	Ingress = "ingress.yaml"
+
+	// Base
+	Base = "base.yaml"
 )
 
 // createCmd represents the create command
@@ -77,15 +80,12 @@ var createCmd = &cobra.Command{
 }
 
 func CreateServiceAndDeployment(name string) {
-	url := fmt.Sprintf("%s%s", BaseURL, Deployment)
-	dataDeployment := GetData(url)
-
-	url = fmt.Sprintf("%s%s", BaseURL, Service)
-	dataServicet := GetData(url)
+	url := fmt.Sprintf("%s%s", BaseURL, Base)
+	data := GetData(url)
 
 	fileName := fmt.Sprintf("%s.yaml", name)
-	data := fmt.Sprintln(string(dataDeployment), string(dataServicet))
-	os.WriteFile(fileName, []byte(data), 0644)
+
+	os.WriteFile(fileName, data, 0644)
 	CreateIngress(name)
 	fmt.Printf("Service and deployment %v created", name)
 }
