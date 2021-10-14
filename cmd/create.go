@@ -25,27 +25,76 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const BaseURL = "https://raw.githubusercontent.com/devalexandre/k8-generator/master/templates/"
+const (
+	// Deployment is the name of the deployment file
+	Deployment = "deployment.yaml"
+	// Service is the name of the service file
+	Service = "service.yaml"
+	// Ingress is the name of the ingress file
+	Ingress = "ingress.yaml"
+)
+
 // createCmd represents the create command
+var Type, NameFile string
+
 var createCmd = &cobra.Command{
 	Use:   "create",
 	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Long: `use generate or -t for generate file
+	-t deployment for generate deployment.yaml 
+	`,
 	Run: func(cmd *cobra.Command, args []string) {
-		verbose, err := cmd.PersistentFlags().GetString("name")
-		if err != nil {
-			panic(err)
+
+		if NameFile == "" {
+			fmt.Println("Please, use -g for generate file")
+			os.Exit(1)
 		}
 
-		data := GetData("https://raw.githubusercontent.com/devalexandre/adonis-v5-cypress/master/server.ts")
+		if Type == "" {
+			fmt.Println("Please, use -t for generate file")
+			os.Exit(1)
+		}
 
-		os.WriteFile(verbose, data, 0644)
-		fmt.Println("name:", verbose)
+		switch expression := Type; expression {
+		case "deployment":
+			CreateDeployment(NameFile)
+		case "service":
+			CreateService(NameFile)
+		case "ingress":
+			CreateIngress(NameFile)
+		default:
+			fmt.Println("Invalid option")
+
+		}
 	},
+}
+
+func CreateDeployment(name string) {
+	url := fmt.Sprintf("%s%s", BaseURL, Deployment)
+	data := GetData(url)
+
+	fileName := fmt.Sprintf("%s.yaml", name)
+	os.WriteFile(fileName, data, 0644)
+	fmt.Printf("Deplymente %v created", name)
+}
+
+func CreateService(name string) {
+	url := fmt.Sprintf("%s%s", BaseURL, Service)
+	data := GetData(url)
+
+	fileName := fmt.Sprintf("%s.yaml", name)
+	os.WriteFile(fileName, data, 0644)
+	fmt.Printf("Service %v created", name)
+}
+
+func CreateIngress(name string) {
+	url := fmt.Sprintf("%s%s", BaseURL, Ingress)
+	data := GetData(url)
+
+	fileName := fmt.Sprintf("%s.yaml", name)
+	os.WriteFile(fileName, data, 0644)
+	fmt.Printf("Ingress %v created", name)
 }
 
 func GetData(url string) []byte {
@@ -65,13 +114,7 @@ func GetData(url string) []byte {
 func init() {
 	rootCmd.AddCommand(createCmd)
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	createCmd.PersistentFlags().String("name", "", "file name")
-
-	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	//	createCmd.Flags().StringVarP(&name, "name", "n", "", "file name")
+	createCmd.Flags().StringVarP(&name, "generate", "g", "", "file name")
+	createCmd.Flags().StringVarP(&Type, "type", "t", "", "file type")
 }
