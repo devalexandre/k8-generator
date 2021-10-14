@@ -44,7 +44,7 @@ var ServiceAndDeployment bool
 
 var createCmd = &cobra.Command{
 	Use:   "create",
-	Short: "A brief description of your command",
+	Short: "create kubernets files",
 	Long: `use generate or -t for generate file
 	-t deployment for generate deployment.yaml 
 	`,
