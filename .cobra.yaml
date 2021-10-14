@@ -1,0 +1,7 @@
+author: Alexandre E Souza <alexandre@indev.net.br>
+year: 2021
+license:
+  header: Cli for create deplyment, service, ingress in k3d.
+  text: |
+    {{ .copyright }}
+
